@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>調剤報酬 施設基準 届出書類作成ツール｜保険薬局向け 令和6年改定対応</title>
+<meta name="description" content="保険薬局の施設基準届出書類（調剤基本料・地域支援体制加算・後発医薬品調剤体制加算等）を作成支援するWebツールです。令和6年改定対応・関東信越厚生局様式準拠。">
+<meta name="keywords" content="施設基準,調剤報酬,保険薬局,届出書類,地域支援体制加算,調剤基本料,令和6年改定,厚生局">
+<meta property="og:title" content="調剤報酬 施設基準 届出書類作成ツール">
+<meta property="og:description" content="保険薬局の施設基準届出書類を自動作成。令和6年改定対応・関東信越厚生局様式準拠。無料で使えるWebツールです。">
+<meta property="og:type" content="website">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💊</text></svg>">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'メイリオ',Meiryo,'MS Gothic',sans-serif;font-size:14px;background:#f0f3f8;color:#1a1a2e}
+.app{max-width:980px;margin:0 auto;padding:16px 14px 60px}
+
+/* Header */
+.hdr{background:#1a3f6f;border-radius:10px;padding:16px 22px;margin-bottom:14px;display:flex;align-items:center;gap:14px;color:#fff}
+.hdr-icon{font-size:26px;flex-shrink:0}
+.hdr-title{font-size:16px;font-weight:700;line-height:1.3}
+.hdr-sub{font-size:11px;opacity:0.75;margin-top:3px}
+
+/* Step nav */
+.step-nav{display:flex;background:#fff;border:1px solid #d0d9e8;border-radius:10px;overflow:hidden;margin-bottom:12px}
+.sn-item{flex:1;padding:11px 6px;text-align:center;cursor:pointer;border-right:1px solid #d0d9e8;font-size:11.5px;line-height:1.4;color:#888;transition:all .15s;user-select:none}
+.sn-item:last-child{border-right:none}
+.sn-item .sn-num{display:block;font-size:9.5px;color:#bbb;margin-bottom:2px;font-weight:700;letter-spacing:.6px}
+.sn-item.active{background:#1a3f6f;color:#fff}
+.sn-item.active .sn-num{color:#8ab4e0}
+.sn-item.done{background:#eaf3de;color:#3b6d11}
+.sn-item.done .sn-num{color:#639922}
+.progress{height:3px;background:#dde6f2;margin-bottom:14px;border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:#1a3f6f;transition:width .3s ease}
+
+/* Save bar */
+.save-bar{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#fff;border:1px solid #d0d9e8;border-radius:8px;margin-bottom:12px;font-size:12px;color:#666}
+.save-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#639922;transition:background .3s}
+.save-dot.unsaved{background:#BA7517}
+
+/* Card */
+.card{background:#fff;border:1px solid #d0d9e8;border-radius:10px;padding:18px 22px;margin-bottom:12px}
+.card-title{font-size:15px;font-weight:700;color:#1a3f6f;margin-bottom:3px}
+.card-sub{font-size:12px;color:#666;margin-bottom:14px;line-height:1.5}
+
+/* Notice */
+.notice{background:#fff8e1;border:1px solid #ffe082;border-left:4px solid #FFA000;border-radius:8px;padding:11px 14px;font-size:12px;color:#4e3400;line-height:1.6;margin-bottom:12px}
+.notice a{color:#1a3f6f}
+.notice-red{background:#fff3f3;border-color:#ffcccc;border-left-color:#e53935;color:#3b0000}
+
+/* Form fields */
+.sec-label{font-size:10.5px;font-weight:700;color:#7a8ca0;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #e8eef6;padding-bottom:6px;margin:18px 0 12px;display:flex;align-items:center;gap:6px}
+.sec-label:first-of-type{margin-top:0}
+.sec-label-badge{font-size:9px;background:#1a3f6f;color:#fff;padding:1px 6px;border-radius:10px;font-weight:700;letter-spacing:0}
+.field-group{margin-bottom:13px}
+.field-label{font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:baseline;flex-wrap:wrap;gap:4px;color:#1a1a2e}
+.req{color:#c0392b;font-size:10.5px;font-weight:700;padding:1px 5px;background:#fff0f0;border-radius:3px}
+.opt{color:#666;font-size:10.5px;font-weight:400}
+.hint{font-size:11.5px;color:#4a5568;line-height:1.65;background:#f5f8fc;border-left:3px solid #1a3f6f;padding:7px 10px;border-radius:0 6px 6px 0;margin-bottom:7px}
+.hint.warn{border-color:#FFA000;background:#fffbf0}
+.hint.new-flag{border-color:#2e7d32;background:#f1f8e9}
+input[type=text],input[type=date],input[type=number],select,textarea{width:100%;padding:8px 10px;border:1.5px solid #cdd5e0;border-radius:6px;font-size:13px;font-family:inherit;background:#fff;color:#1a1a2e;transition:border .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#1a3f6f;box-shadow:0 0 0 2px rgba(26,63,111,0.1)}
+textarea{resize:vertical;min-height:70px;line-height:1.6}
+select{appearance:auto}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.radio-group{display:flex;gap:7px;flex-wrap:wrap}
+.radio-opt{display:flex;align-items:center;gap:6px;padding:7px 12px;border:1.5px solid #cdd5e0;border-radius:6px;cursor:pointer;font-size:12.5px;transition:all .15s;user-select:none;line-height:1.4}
+.radio-opt:hover{border-color:#1a3f6f;background:#f0f4fa}
+.radio-opt.sel{border-color:#1a3f6f;background:#e8f0fb;color:#1a3f6f;font-weight:600}
+.radio-opt input{accent-color:#1a3f6f;flex-shrink:0}
+
+/* Facility grid */
+.fac-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:9px}
+.fac-card{border:1.5px solid #d0d9e8;border-radius:8px;padding:11px 13px;cursor:pointer;transition:all .15s;display:flex;gap:11px;align-items:flex-start}
+.fac-card:hover{border-color:#1a3f6f;background:#f4f7fd}
+.fac-card.checked{border-color:#1a3f6f;background:#e8f0fb}
+.fac-card input[type=checkbox]{margin-top:3px;accent-color:#1a3f6f;width:15px;height:15px;flex-shrink:0}
+.fc-name{font-size:13px;font-weight:600;color:#1a1a2e;line-height:1.4;display:flex;align-items:baseline;flex-wrap:wrap;gap:5px}
+.fc-meta{font-size:10.5px;color:#666;margin-top:3px;line-height:1.4}
+.badge{display:inline-flex;align-items:center;font-size:9.5px;padding:1px 6px;border-radius:10px;font-weight:700;flex-shrink:0}
+.badge-new{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+.badge-change{background:#e3f2fd;color:#1565C0;border:1px solid #90caf9}
+.badge-report{background:#fce4ec;color:#880e4f;border:1px solid #f48fb1}
+
+/* Tag list */
+.tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{background:#e8f0fb;color:#1a3f6f;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;border:1px solid #b3cde8}
+
+/* Tab bar */
+.tab-bar{display:flex;flex-wrap:wrap;gap:5px}
+.tab-btn{padding:6px 13px;border-radius:6px;border:1.5px solid #d0d9e8;font-size:12px;cursor:pointer;background:#fff;color:#555;transition:all .15s;font-family:inherit}
+.tab-btn.active{background:#1a3f6f;color:#fff;border-color:#1a3f6f}
+
+/* Buttons */
+.btn{padding:10px 22px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid;transition:all .15s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:#1a3f6f;color:#fff;border-color:#1a3f6f}
+.btn-primary:hover{background:#0d2d55}
+.btn-ghost{background:#fff;color:#444;border-color:#d0d9e8}
+.btn-ghost:hover{background:#f0f4fa}
+.btn-green{background:#2e7d32;color:#fff;border-color:#2e7d32}
+.btn-green:hover{background:#1b5e20}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
+
+/* Output selection */
+.out-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.out-opt{border:2px solid #d0d9e8;border-radius:10px;padding:16px;cursor:pointer;text-align:center;transition:all .15s}
+.out-opt:hover{border-color:#1a3f6f}
+.out-opt.sel{border-color:#1a3f6f;background:#e8f0fb}
+.out-icon{font-size:30px;margin-bottom:7px}
+.out-name{font-size:14px;font-weight:700}
+.out-desc{font-size:11px;color:#666;margin-top:4px;line-height:1.5}
+
+/* Summary */
+.sum-row{display:flex;padding:8px 0;border-bottom:1px solid #f0f5fa;font-size:13px}
+.sum-row:last-child{border-bottom:none}
+.sum-key{color:#666;flex-shrink:0;width:180px;line-height:1.4}
+.sum-val{color:#1a1a2e;font-weight:500;flex:1;line-height:1.4}
+
+/* URL list */
+.url-list{background:#f8fafc;border:1px solid #d0d9e8;border-radius:8px;padding:12px 14px;margin-top:8px;font-size:11.5px}
+.url-item{display:flex;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px dashed #e0e8f0}
+.url-item:last-child{border-bottom:none}
+.url-item a{color:#1a3f6f;word-break:break-all}
+.url-num{flex-shrink:0;font-weight:600;color:#1a3f6f;min-width:70px}
+
+/* Checklist */
+.cl-section{margin-bottom:18px}
+.cl-section-title{font-size:13px;font-weight:700;color:#1a3f6f;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cl-section-yosiki{font-size:10.5px;color:#666;font-weight:400;background:#f0f4fa;padding:2px 7px;border-radius:10px}
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;transition:background .1s;margin-bottom:3px;border:1px solid transparent}
+.cl-item:hover{background:#f5f8fc}
+.cl-item.checked{background:#eaf3de;border-color:#c5e09e}
+.cl-item input[type=checkbox]{margin-top:2px;accent-color:#2e7d32;width:15px;height:15px;flex-shrink:0;cursor:pointer}
+.cl-item-body{flex:1}
+.cl-item-label{font-size:12.5px;color:#1a1a2e;line-height:1.4}
+.cl-item.checked .cl-item-label{color:#2e7d32;text-decoration:line-through;text-decoration-color:#a5d6a7}
+.cl-item-note{font-size:11px;color:#888;margin-top:2px}
+.cl-req-badge{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:10px;flex-shrink:0;margin-top:3px}
+.cl-req{background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6}
+.cl-opt{background:#f0f4fa;color:#1a3f6f;border:1px solid #c5d5ea}
+.cl-progress{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:9px 13px;background:#f8fafc;border-radius:8px;border:1px solid #d0d9e8}
+.cl-progress-bar{flex:1;height:6px;background:#dde6f2;border-radius:3px;overflow:hidden}
+.cl-progress-fill{height:100%;background:#2e7d32;border-radius:3px;transition:width .3s}
+.cl-progress-text{font-size:12px;color:#444;white-space:nowrap;font-weight:600}
+.field-hidden{display:none!important}
+/* Responsive */
+@media(max-width:580px){.field-row,.field-row-3{grid-template-columns:1fr}.out-grid{grid-template-columns:1fr}.fac-grid{grid-template-columns:1fr}.step-nav{flex-wrap:wrap}.sn-item{min-width:calc(50% - 1px);border-bottom:1px solid #d0d9e8}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-icon">📋</div>
+  <div>
+    <div class="hdr-title">調剤報酬 施設基準 届出書類作成ツール</div>
+    <div class="hdr-sub">令和6年改定対応・関東信越厚生局版 / 関東信越厚生局 令和6年度診療報酬改定対応 ／ 全12様式（様式84〜92）完全収録 ／ 公式様式番号・項目準拠版</div>
+  </div>
+</div>
+
+<!-- NOTICE -->
+<div class="notice">
+  ⚠️ <strong>ご注意：</strong>本ツールは入力作業を補助するものです。<strong>提出前に必ず公式様式と照合</strong>し、管轄事務所（関東信越厚生局）へ郵送してください。
+  公式様式は <a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/shinsei/shido_kansa/shitei_kijun/tokukei_shinryo_r06.html" target="_blank">厚生局ウェブサイト</a> からダウンロードできます。令和8年度改定後は新様式への切り替えが必要です。
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <div class="save-dot" id="saveDot"></div>
+  <span id="saveStatus">データなし</span>
+  <div style="flex:1"></div>
+  <button class="btn btn-ghost" style="padding:5px 12px;font-size:11px" onclick="saveAll()">💾 途中保存</button>
+  <button class="btn btn-ghost" style="padding:5px 12px;font-size:11px;color:#c0392b" onclick="clearAll()">リセット</button>
+</div>
+
+<div class="progress"><div class="progress-fill" id="progFill" style="width:20%"></div></div>
+
+<!-- STEP NAV -->
+<div class="step-nav">
+  <div class="sn-item active" id="sn0" onclick="gotoStep(0)"><span class="sn-num">STEP 1</span>施設基準選択</div>
+  <div class="sn-item" id="sn1" onclick="gotoStep(1)"><span class="sn-num">STEP 2</span>薬局基本情報</div>
+  <div class="sn-item" id="sn2" onclick="gotoStep(2)"><span class="sn-num">STEP 3</span>加算要件入力</div>
+  <div class="sn-item" id="sn3" onclick="gotoStep(3)"><span class="sn-num">STEP 4</span>確認・出力</div>
+</div>
+
+<!-- ============================================================ STEP 1 ============================================================ -->
+<div id="page0">
+  <div class="card">
+    <div class="card-title">届出する施設基準を選択（複数選択可）</div>
+    <div class="card-sub">
+      選択した施設基準の要件入力欄のみSTEP3に表示されます。複数の様式で共通する入力項目は1回だけ入力します。<br>
+      <span style="font-size:11px;color:#888">★新設＝令和6年度より新設　★改定＝令和6年度改定で届出直しが必要</span>
+    </div>
+    <div class="fac-grid" id="facGrid"></div>
+  </div>
+
+  <div class="card" id="selPreview" style="display:none">
+    <div class="card-title" style="margin-bottom:6px">選択中の施設基準</div>
+    <div class="tag-list" id="selTags"></div>
+  </div>
+
+  <div class="card" style="padding:14px 18px">
+    <div style="font-size:12px;font-weight:700;color:#1a3f6f;margin-bottom:8px">📎 公式様式ファイルのURL一覧（関東信越厚生局）</div>
+    <div class="url-list">
+      <div class="url-item"><span class="url-num">様式84</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t84.pdf" target="_blank">調剤基本料（PDF）</a> ／ <a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t84.docx" target="_blank">Word</a></div>
+      <div class="url-item"><span class="url-num">様式87</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87.pdf" target="_blank">後発医薬品調剤体制加算（PDF）</a> ／ <a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87.docx" target="_blank">Word</a></div>
+      <div class="url-item"><span class="url-num">様式87の2</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87-2.pdf" target="_blank">特別調剤基本料B（PDF）</a></div>
+      <div class="url-item"><span class="url-num">様式87の3</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87-3.pdf" target="_blank">地域支援体制加算（共通基準）（PDF）</a> ／ <a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87-3.docx" target="_blank">Word</a></div>
+      <div class="url-item"><span class="url-num">様式87の3の2</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87-3-2.pdf" target="_blank">地域支援体制加算（実績基準）（PDF）</a></div>
+      <div class="url-item"><span class="url-num">様式87の3の4</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87-3-4.pdf" target="_blank">連携強化加算（PDF）</a> ／ <a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87-3-4.docx" target="_blank">Word</a> ★改定</div>
+      <div class="url-item"><span class="url-num">様式87の3の5</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87-3-5.pdf" target="_blank">在宅薬学総合体制加算（PDF）</a> ★新設</div>
+      <div class="url-item"><span class="url-num">様式87の3の6</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t87-3-6.pdf" target="_blank">医療DX推進体制整備加算（PDF）</a> ★新設</div>
+      <div class="url-item"><span class="url-num">様式88</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t88.pdf" target="_blank">無菌製剤処理加算（PDF）</a> ／ <a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t88.docx" target="_blank">Word</a></div>
+      <div class="url-item"><span class="url-num">様式89</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t89.pdf" target="_blank">在宅患者医療用麻薬持続注射療法加算・在宅中心静脈栄養法加算（PDF）</a></div>
+      <div class="url-item"><span class="url-num">様式90</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t90.pdf" target="_blank">かかりつけ薬剤師指導料（PDF）</a> ／ <a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t90.docx" target="_blank">Word</a></div>
+      <div class="url-item"><span class="url-num">様式92</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t92.pdf" target="_blank">特定薬剤管理指導加算2（PDF）</a> ／ <a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-t92.docx" target="_blank">Word</a></div>
+      <div class="url-item"><span class="url-num">別添2（表紙）</span><a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/r6-2-000-01.docx" target="_blank">特掲診療料施設基準届出書（共通表紙）（Word）</a></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="gotoStep(1)">次へ：基本情報入力 →</button>
+  </div>
+</div>
+
+<!-- ============================================================ STEP 2 ============================================================ -->
+<div id="page1" style="display:none">
+  <div class="card">
+    <div class="card-title">保険薬局 基本情報</div>
+    <div class="card-sub">全届出書類（別添2＋各様式）に共通する情報です。ここで入力した内容は各様式に自動反映されます。</div>
+
+    <div class="sec-label">薬局識別情報</div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">薬局名称 <span class="req">必須</span></div>
+        <input type="text" id="b_name" placeholder="例：○○調剤薬局">
+      </div>
+      <div class="field-group">
+        <div class="field-label">保険薬局コード</div>
+        <div class="hint">厚生局への指定番号（10桁）。保険薬局指定通知書に記載。</div>
+        <input type="text" id="b_code" placeholder="例：1234567890">
+      </div>
+    </div>
+    <div class="field-group">
+      <div class="field-label">所在地（都道府県から） <span class="req">必須</span></div>
+      <input type="text" id="b_addr" placeholder="例：東京都○○市○○町1丁目2番3号">
+    </div>
+    <div class="field-row">
+      <div class="field-group"><div class="field-label">電話番号</div><input type="text" id="b_tel" placeholder="例：03-0000-0000"></div>
+      <div class="field-group"><div class="field-label">FAX番号</div><input type="text" id="b_fax" placeholder="例：03-0000-0001"></div>
+    </div>
+
+    <div class="sec-label">開設者・管理者</div>
+    <div class="field-row">
+      <div class="field-group"><div class="field-label">開設者氏名（法人は代表者名） <span class="req">必須</span></div><input type="text" id="b_owner" placeholder="例：山田 太郎"></div>
+      <div class="field-group"><div class="field-label">管理薬剤師氏名 <span class="req">必須</span></div><input type="text" id="b_mgr" placeholder="例：鈴木 花子"></div>
+    </div>
+    <div class="field-row">
+      <div class="field-group"><div class="field-label">管理薬剤師 薬剤師免許番号</div><input type="text" id="b_mgr_lic" placeholder="例：第123456号"></div>
+      <div class="field-group"><div class="field-label">管理薬剤師 保険薬剤師登録番号</div><input type="text" id="b_mgr_ins" placeholder="例：第789012号"></div>
+    </div>
+    <div class="field-row">
+      <div class="field-group"><div class="field-label">届出予定日 <span class="req">必須</span></div><input type="date" id="b_date"></div>
+      <div class="field-group"><div class="field-label">管理薬剤師の当薬局継続勤務年数</div><input type="number" id="b_mgr_years" min="0" placeholder="年" style="max-width:140px"></div>
+    </div>
+
+    <div class="sec-label">薬剤師在籍状況</div>
+    <div class="hint">常勤換算：週32時間以上勤務が1.0。未満は「実際の週勤務時間÷32」で計算。</div>
+    <div class="field-row-3">
+      <div class="field-group"><div class="field-label">薬剤師数（常勤）</div><input type="number" id="b_ph_full" min="0" value="1" placeholder="名"></div>
+      <div class="field-group"><div class="field-label">薬剤師数（非常勤）</div><input type="number" id="b_ph_part" min="0" value="0" placeholder="名"></div>
+      <div class="field-group"><div class="field-label">常勤換算合計</div><input type="number" id="b_ph_total" min="0" step="0.1" placeholder="例：2.5"></div>
+    </div>
+
+    <div class="sec-label">開局体制 <span class="sec-label-badge">地域支援体制加算・夜間等加算で必要</span></div>
+    <div class="hint">各曜日について開局時間を入力してください。閉局日は「閉局」と入力。夜間・休日対応がある場合は実際の対応時間を記入してください。</div>
+    <div style="background:#f8fafc;border:1px solid #d0d9e8;border-radius:8px;overflow:hidden;margin-bottom:12px">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+        <thead>
+          <tr style="background:#1a3f6f;color:#fff">
+            <th style="padding:8px 12px;text-align:left;width:60px">曜日</th>
+            <th style="padding:8px 12px;text-align:left">開局開始</th>
+            <th style="padding:8px 12px;text-align:left">開局終了</th>
+            <th style="padding:8px 12px;text-align:left">備考（時間外対応・閉局等）</th>
+          </tr>
+        </thead>
+        <tbody id="hoursTableBody">
+          <tr style="border-bottom:1px solid #e0e8f0">
+            <td style="padding:7px 12px;font-weight:600;color:#1a3f6f">月</td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_mon_s" placeholder="09:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_mon_e" placeholder="19:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_mon_n" placeholder="" style="width:100%;" oninput="markUnsaved()"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #e0e8f0;background:#fafbfd">
+            <td style="padding:7px 12px;font-weight:600;color:#1a3f6f">火</td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_tue_s" placeholder="09:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_tue_e" placeholder="19:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_tue_n" placeholder="" style="width:100%;" oninput="markUnsaved()"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #e0e8f0">
+            <td style="padding:7px 12px;font-weight:600;color:#1a3f6f">水</td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_wed_s" placeholder="09:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_wed_e" placeholder="19:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_wed_n" placeholder="" style="width:100%;" oninput="markUnsaved()"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #e0e8f0;background:#fafbfd">
+            <td style="padding:7px 12px;font-weight:600;color:#1a3f6f">木</td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_thu_s" placeholder="09:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_thu_e" placeholder="19:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_thu_n" placeholder="" style="width:100%;" oninput="markUnsaved()"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #e0e8f0">
+            <td style="padding:7px 12px;font-weight:600;color:#1a3f6f">金</td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_fri_s" placeholder="09:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_fri_e" placeholder="19:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_fri_n" placeholder="" style="width:100%;" oninput="markUnsaved()"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #e0e8f0;background:#fafbfd">
+            <td style="padding:7px 12px;font-weight:600;color:#e65100">土</td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_sat_s" placeholder="09:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_sat_e" placeholder="13:00" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_sat_n" placeholder="例：午後閉局" style="width:100%;" oninput="markUnsaved()"></td>
+          </tr>
+          <tr style="border-bottom:1px solid #e0e8f0">
+            <td style="padding:7px 12px;font-weight:600;color:#c0392b">日</td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_sun_s" placeholder="閉局" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_sun_e" placeholder="" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_sun_n" placeholder="例：閉局" style="width:100%;" oninput="markUnsaved()"></td>
+          </tr>
+          <tr style="background:#fff8e1">
+            <td style="padding:7px 12px;font-weight:600;color:#c0392b">祝</td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_hol_s" placeholder="閉局" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_hol_e" placeholder="" style="width:90px" oninput="markUnsaved()"></td>
+            <td style="padding:4px 8px"><input type="text" id="b_h_hol_n" placeholder="例：閉局" style="width:100%;" oninput="markUnsaved()"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="field-group">
+      <div class="field-label">年末年始・お盆等の休業期間</div>
+      <input type="text" id="b_holiday" placeholder="例：年末年始（12/30〜1/3）、お盆（8/13〜15）" oninput="markUnsaved()">
+    </div>
+
+    <div class="sec-label">調剤実績①　集中率・調剤基本料区分の計算用 <span class="sec-label-badge">様式84に転記</span></div>
+    <div class="hint warn">⚠️ <strong>集中率の計算期間：前年6月1日〜当年5月31日（1年間）</strong><br>この期間の処方箋受付回数を入力してください。調剤基本料の区分判定・集中率の算出に使用します。</div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">処方箋総受付回数（6/1〜5/31）</div>
+        <input type="number" id="b_rx_total" min="0" placeholder="回" oninput="markUnsaved()">
+      </div>
+      <div class="field-group">
+        <div class="field-label">主たる保険医療機関名（集中率算出用）</div>
+        <input type="text" id="b_rx_main" placeholder="例：○○病院・○○クリニック" oninput="markUnsaved()">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">主たる保険医療機関への処方箋受付回数（同期間）</div>
+        <input type="number" id="b_rx_main_n" min="0" placeholder="回" oninput="markUnsaved()">
+      </div>
+      <div class="field-group">
+        <div class="field-label">処方箋集中率 <span style="font-size:10.5px;background:#e8f0fb;color:#1a3f6f;padding:1px 7px;border-radius:10px;font-weight:600">自動計算</span></div>
+        <div class="hint">上の2項目から自動計算されます（主たる医療機関への受付回数 ÷ 総受付回数 × 100）。</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="number" id="b_rx_conc" min="0" max="100" step="0.1" placeholder="—" readonly
+            style="max-width:120px;background:#f0f4fa;font-weight:600;color:#1a3f6f;font-size:14px">
+          <span style="font-size:13px;color:#1a3f6f;font-weight:600" id="b_rx_conc_disp">— %</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-label" style="margin-top:18px">調剤実績②　地域支援体制加算の実績要件計算用 <span class="sec-label-badge">様式87の3に転記</span></div>
+    <div class="hint warn">⚠️ <strong>地域支援体制加算の実績期間：算定を開始する月の前月から遡って1年間</strong><br>例：6月から算定開始の場合 → 前年5月1日〜当年4月30日の実績。①の集中率計算期間（6/1〜5/31）とは異なります。<br>この回数は地域支援体制加算の実績要件テーブル（STEP3）の自動計算にも使用されます。</div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">処方箋総受付回数（実績期間・地域支援用）</div>
+        <input type="number" id="b_rx_total_chiki" min="0" placeholder="回" oninput="markUnsaved();refreshChikiTable()">
+      </div>
+      <div class="field-group">
+        <div class="field-label">実績集計期間（開始〜終了）</div>
+        <div class="hint" style="margin-bottom:6px">算定開始月の前月から遡って1年間を記入してください。</div>
+        <input type="text" id="b_rx_chiki_period" placeholder="例：令和5年5月1日〜令和6年4月30日" oninput="markUnsaved()">
+      </div>
+    </div>
+
+    <div class="sec-label" style="margin-top:18px">後発医薬品調剤体制加算用 <span class="sec-label-badge">様式87に転記</span></div>
+    <div class="hint">直近3か月間（届出月の前々月〜前月）の後発医薬品調剤数量割合を入力してください。</div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">後発医薬品調剤割合（直近3か月） <span class="sec-label-badge" style="font-size:9px">様式87</span></div>
+        <input type="number" id="b_generic" min="0" max="100" step="0.1" placeholder="（%）" oninput="markUnsaved()">
+      </div>
+      <div class="field-group">
+        <div class="field-label">後発医薬品調剤数量割合</div>
+        <input type="number" id="b_generic_q" min="0" max="100" step="0.1" placeholder="（%）" oninput="markUnsaved()">
+      </div>
+    </div>
+
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="gotoStep(0)">← 戻る</button>
+    <button class="btn btn-primary" onclick="gotoStep(2)">次へ：加算要件入力 →</button>
+  </div>
+</div>
+
+<!-- ============================================================ STEP 3 ============================================================ -->
+<div id="page2" style="display:none">
+  <div class="card" style="padding:14px 18px">
+    <div class="tab-bar" id="facTabs"></div>
+  </div>
+  <div id="facForms"></div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="gotoStep(1)">← 戻る</button>
+    <button class="btn btn-primary" onclick="gotoStep(3)">次へ：確認・出力 →</button>
+  </div>
+</div>
+
+<!-- ============================================================ STEP 4 ============================================================ -->
+<div id="page3" style="display:none">
+  <div class="card">
+    <div class="card-title">入力内容の確認</div>
+    <div id="summaryArea"></div>
+  </div>
+
+  <div class="card" id="checklistCard">
+    <div class="card-title">📎 添付書類チェックリスト</div>
+    <div class="card-sub">選択した施設基準ごとに必要な添付書類の一覧です。チェックを入れながら準備状況を確認してください。<br><span style="font-size:11px">提出時はすべての<strong style="color:#c0392b">必須</strong>書類が揃っていることを確認してください。</span></div>
+    <div class="cl-progress">
+      <div class="cl-progress-bar"><div class="cl-progress-fill" id="clProgFill" style="width:0%"></div></div>
+      <span class="cl-progress-text" id="clProgText">0 / 0 件 確認済み</span>
+    </div>
+    <div id="checklistArea"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📄 公式様式への書き込み出力</div>
+    <div class="card-sub">入力内容を公式Wordファイルに書き込んで出力します。レイアウトは厚生局配布の公式様式のままです。</div>
+    <div class="notice new-flag" style="margin:0 0 14px;border-color:#2e7d32;background:#f1f8e9">
+      ✅ ボタンを押すだけで、公式Wordファイルに入力内容が書き込まれた状態でZIPダウンロードできます。<br>
+      <span style="font-size:11.5px;color:#555">生成された書類は <strong>そのまま印刷・提出用</strong> です。厚生局公式様式のレイアウトを崩さずに出力します。</span>
+    </div>
+    <div class="btn-row" style="margin-bottom:0">
+      <button class="btn btn-green" id="generateWordBtn" onclick="generateWordFiles()" style="font-size:14px;padding:12px 24px">
+        📄 公式様式Wordファイルを生成・ダウンロード（ZIP）
+      </button>
+      <button class="btn btn-ghost" onclick="exportStateJSON()" style="font-size:12px">
+        💾 入力データをJSONで保存（バックアップ）
+      </button>
+    </div>
+    <div style="margin-top:10px;padding:10px 14px;background:#f5f8fc;border-radius:8px;border:1px solid #d0d9e8;font-size:11.5px;color:#555">
+      <strong>実行手順：</strong><br>
+      1. 上のボタンで <code>app_state.json</code> をダウンロード<br>
+      2. <code>fill_forms.py</code> をダウンロード<br>
+      3. ターミナルで実行：<code>python fill_forms.py app_state.json ./output/</code><br>
+      4. <code>output/</code> フォルダに公式様式Wordファイルが生成されます
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 作業用ファイルの出力（確認・控え用）</div>
+    <div class="card-sub">入力内容を確認・印刷するための補助ファイルです。そのままでは提出できません。</div>
+    <div class="out-grid">
+      <div class="out-opt sel" id="outXL" onclick="toggleOut('xl')">
+        <div class="out-icon">📊</div>
+        <div class="out-name">Excel（.xlsx）</div>
+        <div class="out-desc">様式別シート分け<br>項目名付きで転記<br>記入漏れ確認に最適</div>
+      </div>
+      <div class="out-opt" id="outPDF" onclick="toggleOut('pdf')">
+        <div class="out-icon">📄</div>
+        <div class="out-name">PDF（.pdf）</div>
+        <div class="out-desc">A4縦・印刷最適化<br>控え保存用</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-green" onclick="doExport()">⬇ 作業用ファイルを出力する</button>
+      <button class="btn btn-ghost" onclick="gotoStep(2)">← 修正に戻る</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+<footer style="text-align:center;padding:18px 16px;font-size:11px;color:#aaa;border-top:1px solid #e0e8f0;margin-top:8px;background:#fff">
+  調剤報酬 施設基準 届出書類作成ツール ／ 令和6年改定対応・関東信越厚生局版<br>
+  <span style="color:#c0392b;font-weight:600">本ツールは作成補助用です。提出前に必ず公式様式・最新通知と照合してください。</span><br>
+  <span style="margin-top:4px;display:inline-block">
+    <a href="https://kouseikyoku.mhlw.go.jp/kantoshinetsu/shinsei/shido_kansa/shitei_kijun/tokukei_shinryo_r06.html" 
+       target="_blank" style="color:#1a3f6f">関東信越厚生局 公式様式一覧</a>
+  </span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ============================================================
+// 施設基準マスタ（令和6年改定 全12様式 公式様式番号・項目準拠）
+// showIf: {field:'親フィールドID', matchesAny:['表示条件値',...]}
+// attachments: 添付書類チェックリスト [{label, note, required}]
+// ============================================================
+const FAC = [
+  {
+    id:'f84', yosiki:'様式84', name:'調剤基本料',
+    pts:'16〜45点', cat:'調剤基本料',
+    desc:'処方箋受付回数・集中率・グループ薬局の状況等に基づき区分が決まります。',
+    attachments:[
+      {label:'様式84（調剤基本料）記入済み', required:true},
+      {label:'別添2（特掲診療料施設基準届出書・共通表紙）記入済み', required:true},
+      {label:'処方箋受付回数・集中率の計算根拠資料（レセプト集計等）', required:true},
+      {label:'グループ内薬局一覧（グループ所属の場合）', required:false, note:'グループに所属する場合のみ'},
+      {label:'不動産賃貸借契約書等の写し（特別な関係がある場合）', required:false, note:'保険医療機関と特別な関係がある場合のみ'},
+    ],
+    fields:[
+      {id:'kubun',t:'radio',label:'調剤基本料の届出区分',
+        opts:['調剤基本料1（42点）：受付回数4,000回以下等','調剤基本料2（26点）：受付回数が多い等','調剤基本料3イ（21点）','調剤基本料3ロ（16点）','調剤基本料3ハ（32点）','特別調剤基本料A（7点）','特別調剤基本料B（3点）'],
+        hint:'前年3月〜当年2月の処方箋受付回数、集中率、グループ薬局の状況をもとに、様式84の判定表に従い区分を確認してください。'},
+      {id:'group',t:'radio',label:'薬局グループへの所属',
+        opts:['所属していない（個店）','グループに所属している'],
+        hint:'同一グループ内に複数の保険薬局がある場合、グループの月当たり処方箋受付回数の合計が区分判定に影響します。'},
+      {id:'group_name',t:'text',label:'グループ名',
+        hint:'グループ内で統一したグループ名を記載してください。',
+        showIf:{field:'group',matchesAny:['グループに所属している']}},
+      {id:'group_rx',t:'number',label:'グループ内の月当たり処方箋受付回数合計',unit:'回',
+        hint:'グループ全薬局（当年4月末時点）の月当たり処方箋受付回数の合計値。',
+        showIf:{field:'group',matchesAny:['グループに所属している']}},
+      {id:'fudosan',t:'radio',label:'保険医療機関との不動産取引等特別な関係',
+        opts:['なし','あり（不動産賃貸借）','あり（その他特別な関係）'],
+        hint:'病院・診療所との不動産賃貸借・譲渡等の特別な関係の有無を確認してください。平成28年10月以降の状況に基づきます。'},
+    ]
+  },
+  {
+    id:'f87', yosiki:'様式87', name:'後発医薬品調剤体制加算',
+    pts:'21点/28点/30点', cat:'後発医薬品',
+    desc:'直近3か月間の後発医薬品調剤数量割合に基づき区分が決まります。',
+    attachments:[
+      {label:'様式87（後発医薬品調剤体制加算）記入済み', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'直近3か月の後発医薬品調剤数量割合の計算根拠（レセプトデータ等）', required:true},
+    ],
+    fields:[
+      {id:'kubun',t:'radio',label:'届出区分',
+        opts:['後発医薬品調剤体制加算1（21点）：75%以上80%未満','後発医薬品調剤体制加算2（28点）：80%以上85%未満','後発医薬品調剤体制加算3（30点）：85%以上'],
+        hint:'直近3か月間の数量ベースの後発医薬品調剤割合で区分を選択してください。'},
+      {id:'period',t:'text',label:'直近3か月の期間',
+        hint:'例：令和6年3月〜令和6年5月（届出月の前々月から3か月）'},
+      {id:'rate',t:'number',label:'後発医薬品調剤数量割合（直近3か月）',unit:'%',
+        hint:'算出式：後発品の調剤数量 ÷（先発品の調剤数量 ＋ 後発品の調剤数量）×100。バイオ後続品も含む。'},
+    ]
+  },
+  {
+    id:'f87_2', yosiki:'様式87の2', name:'特別調剤基本料Bに係る届出',
+    pts:'3点', cat:'調剤基本料',
+    desc:'特別調剤基本料Bの算定薬局（診療所内薬局等）が対象。',
+    attachments:[
+      {label:'様式87の2記入済み', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'保険医療機関と同一建物内にあることを示す書類（賃貸借契約書等）', required:true},
+    ],
+    fields:[
+      {id:'naiyou',t:'textarea',label:'特別調剤基本料Bに該当する事由',
+        hint:'保険医療機関と同一建物内にある等、特別調剤基本料Bの要件に該当する理由を記載してください。'},
+    ]
+  },
+  {
+    id:'f87_3', yosiki:'様式87の3・87の3の2', name:'地域支援体制加算',
+    pts:'32点/40点', cat:'地域支援', badge:'change',
+    desc:'令和6年改定で届出直しが必要。共通体制要件（様式87の3）＋実績要件（様式87の3の2）の両方が必要。',
+    attachments:[
+      {label:'様式87の3（地域支援体制加算・共通体制要件）記入済み', required:true},
+      {label:'様式87の3の2（実績要件）記入済み', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'薬剤服用歴の記録様式の見本', required:true, note:'「3.薬剤服用歴の記録」要件の確認用'},
+      {label:'PMDAメディナビ登録確認メールの写し', required:true, note:'「2.PMDAメディナビ登録」要件の確認用'},
+      {label:'職員研修計画書・研修実施実績を示す文書', required:true, note:'「4.職員研修」要件の確認用'},
+      {label:'連携薬局との24時間対応に関する取り決め文書（協定書等）', required:false, note:'連携対応の場合のみ'},
+      {label:'在宅医療に必要な医療材料等の供給に係る取り決め文書', required:false, note:'「6.医療材料供給体制」の確認書類'},
+      {label:'地域の多職種連携会議の出席リスト（会議名・参加日）', required:false, note:'様式87の3の2・3の3への添付書類。地域ケア会議等への参加実績がある場合'},
+    ],
+    fields:[] // カスタムカード（buildChikiCard）で管理
+  },
+  {
+    id:'f87_3_4', yosiki:'様式87の3の4', name:'連携強化加算（調剤基本料）',
+    pts:'2点', cat:'地域支援', badge:'change',
+    desc:'令和6年改定で要件が変更。感染症対応計画への参画が要件に追加されました。',
+    attachments:[
+      {label:'様式87の3の4（連携強化加算）記入済み', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'感染症対応計画・地域医療計画等の関係会議への参加を証明する書類（出席名簿・議事録の写し等）', required:true},
+      {label:'連携医療機関・訪問看護ステーションとの連携協定書等の写し', required:false, note:'連携協定がある場合'},
+    ],
+    fields:[
+      {id:'kansenkeikaku',t:'radio',label:'感染症対応計画・医療計画等への参画',
+        opts:['都道府県・市区町村の感染症対策計画に参画','地域の協議会・医療計画策定に参画','両方に参画'],
+        hint:'都道府県または市区町村の感染症に係る計画・地域の医療計画等における薬局に係る事項の策定や実施に係る会議等に参画していることが令和6年改定で追加された要件です。'},
+      {id:'kansenhoken',t:'text',label:'参画している協議会・会議等の名称',
+        hint:'参加している協議会・研究会・行政主催会議等の名称を記載してください。（例：○○市感染症対策協議会、○○地域在宅医療・介護連携推進協議会）'},
+      {id:'kyotei',t:'text',label:'連携している医療機関・関係機関',
+        hint:'在宅医療等の連携協定を締結している医療機関・訪問看護ステーション等の名称を記載してください。'},
+    ]
+  },
+  {
+    id:'f87_3_5', yosiki:'様式87の3の5', name:'在宅薬学総合体制加算',
+    pts:'15点/22点', cat:'在宅', badge:'new',
+    desc:'★令和6年改定で新設。在宅患者への薬学的管理・指導の包括的な体制に係る加算です。',
+    attachments:[
+      {label:'様式87の3の5（在宅薬学総合体制加算）記入済み', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'24時間対応体制を示す書類（連携協定書等）', required:false, note:'連携対応の場合のみ'},
+      {label:'在宅患者への訪問薬剤管理指導実績を示す資料（レセプト集計等）', required:true},
+      {label:'無菌製剤処理設備の設置・利用に関する書類（連携利用の場合は協定書）', required:false, note:'加算2届出時や無菌調製体制がある場合'},
+      {label:'担当薬剤師の研修修了証・資格証の写し', required:false, note:'加算2届出時に必要な要件に応じて'},
+    ],
+    fields:[
+      {id:'kubun',t:'radio',label:'届出区分',
+        opts:['在宅薬学総合体制加算1（15点）：基本要件充足','在宅薬学総合体制加算2（22点）：加算1の要件＋特定要件充足'],
+        hint:'在宅患者への対応体制（24時間対応・在宅実績等）と薬剤師の研修要件の充足状況で区分が決まります。'},
+      {id:'h24',t:'radio',label:'24時間対応体制',
+        opts:['自局単独で24時間対応','連携薬局との取り決めにより24時間対応'],
+        hint:'在宅患者からの緊急連絡に対して24時間対応できる体制の整備状況を選択してください。'},
+      {id:'renk_name24',t:'text',label:'連携薬局名（連携対応の場合）',
+        hint:'連携により24時間対応を確保している薬局の名称と所在地を記載してください。',
+        showIf:{field:'h24',matchesAny:['連携薬局との取り決めにより24時間対応']}},
+      {id:'zaita_jisseki',t:'number',label:'在宅患者への訪問薬剤管理指導実績（前年度）',unit:'件',
+        hint:'訪問薬剤管理指導料・在宅患者緊急訪問薬剤管理指導料等の合計算定件数（前年度）。'},
+      {id:'mutu_taisei',t:'radio',label:'無菌製剤処理の実施体制',
+        opts:['自局に無菌調製設備あり','連携薬局の設備を利用','未整備'],
+        hint:'高カロリー輸液・抗がん剤注射剤等の無菌製剤を調製できる体制の状況を選択してください。'},
+      {id:'mutu_renk',t:'text',label:'連携薬局名・協定概要（連携利用の場合）',
+        hint:'連携薬局の名称と無菌調製に関する協定内容の概要を記載してください。',
+        showIf:{field:'mutu_taisei',matchesAny:['連携薬局の設備を利用']}},
+      {id:'yakuzaishi_kenshu',t:'textarea',label:'担当薬剤師の研修・資格取得状況',
+        hint:'在宅医療・緩和ケア・がん薬物療法等に関する研修受講状況や専門薬剤師等の資格取得状況を記載してください。'},
+    ]
+  },
+  {
+    id:'f87_3_6', yosiki:'様式87の3の6', name:'医療DX推進体制整備加算',
+    pts:'4点', cat:'DX', badge:'new',
+    desc:'★令和6年改定で新設。オンライン資格確認・電子処方箋への対応等が要件です。',
+    attachments:[
+      {label:'様式87の3の6（医療DX推進体制整備加算）記入済み', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'オンライン資格確認システム導入・運用を証明する書類（厚生局等からの通知等）', required:true},
+      {label:'院内掲示の写真（患者から見える位置への掲示）', required:true},
+      {label:'ウェブサイトへの公表状況を示すURL・スクリーンショット', required:false, note:'ウェブサイトがある場合'},
+    ],
+    fields:[
+      {id:'onsi',t:'radio',label:'オンライン資格確認の導入・運用状況',
+        opts:['運用中（マイナ保険証対応）','導入済・運用準備中'],
+        hint:'マイナンバーカードによるオンライン資格確認システムを導入し、実際に運用していることが要件です。'},
+      {id:'densiprocession',t:'radio',label:'電子処方箋の受付対応状況',
+        opts:['電子処方箋管理サービスに対応済み','対応準備中'],
+        hint:'電子処方箋管理サービスへの対応状況を選択してください。'},
+      {id:'yakureki_densi',t:'radio',label:'電子薬歴の使用状況',
+        opts:['電子薬歴システムを使用している','紙薬歴を使用'],
+        hint:'電子薬歴システムの導入・使用状況を選択してください。'},
+      {id:'system_name',t:'text',label:'電子薬歴システム名',
+        hint:'使用中の電子薬歴システムのメーカー名・製品名を記載してください。',
+        showIf:{field:'yakureki_densi',matchesAny:['電子薬歴システムを使用している']}},
+      {id:'keiji',t:'radio',label:'院内掲示の実施状況',
+        opts:['掲示済み（患者から見える場所に掲示）','掲示予定'],
+        hint:'医療DX推進体制整備加算を算定する旨の患者への掲示が必要です。'},
+      {id:'kouhyo',t:'radio',label:'ウェブサイトへの公表状況',
+        opts:['公表済み','公表予定（3か月以内）','ウェブサイトなし'],
+        hint:'医療DX推進体制の整備に関する事項をウェブサイトに公表することが原則求められます。'},
+      {id:'url',t:'text',label:'公表しているウェブサイトのURL',
+        hint:'DX推進体制を公表しているページのURLを記載してください。',
+        showIf:{field:'kouhyo',matchesAny:['公表済み','公表予定（3か月以内）']}},
+    ]
+  },
+  {
+    id:'f88', yosiki:'様式88', name:'無菌製剤処理加算',
+    pts:'500点/100点（連日）', cat:'在宅',
+    desc:'高カロリー輸液・抗癌剤等の無菌製剤処理を実施するための設備・人員要件の届出です。',
+    attachments:[
+      {label:'様式88（無菌製剤処理加算）記入済み', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'クリーンルームまたは安全キャビネットの設置を示す書類・写真', required:true, note:'自局設置の場合'},
+      {label:'他薬局のクリーンルーム利用に関する連携協定書の写し', required:false, note:'他薬局設備を利用する場合のみ'},
+      {label:'無菌製剤処理担当薬剤師の研修修了証・資格証の写し', required:true},
+    ],
+    fields:[
+      {id:'setsubi',t:'radio',label:'無菌調製設備の種別',
+        opts:['クリーンルーム（自局に設置）','安全キャビネット（クラスII以上：自局に設置）','他の保険薬局のクリーンルームを利用（連携協定）'],
+        hint:'高カロリー輸液の無菌調製にはクリーンルームが、抗がん剤等の無菌製剤にはクラスII以上の安全キャビネットが必要です。'},
+      {id:'renk_yakkyoku',t:'text',label:'連携薬局名・協定内容',
+        hint:'他の保険薬局の無菌調製設備を利用する場合、当該薬局の名称・所在地と連携協定の概要を記載してください。',
+        showIf:{field:'setsubi',matchesAny:['他の保険薬局のクリーンルームを利用（連携協定）']}},
+      {id:'tantou',t:'text',label:'無菌製剤処理担当薬剤師の氏名・資格',
+        hint:'無菌製剤処理を担当する薬剤師の氏名と関連資格（例：日本病院薬剤師会無菌製剤調製実習修了、がん専門薬剤師等）を記載してください。'},
+    ]
+  },
+  {
+    id:'f89', yosiki:'様式89', name:'在宅患者医療用麻薬持続注射療法加算・在宅中心静脈栄養法加算',
+    pts:'250点/150点', cat:'在宅',
+    desc:'在宅での麻薬持続注射療法・中心静脈栄養法の薬剤管理指導に係る体制の届出です。',
+    attachments:[
+      {label:'様式89記入済み', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'担当薬剤師の麻薬取扱者免許証の写し', required:false, note:'麻薬持続注射療法加算を届出する場合のみ必須'},
+      {label:'連携医療機関・訪問看護ステーションとの連携体制を示す書類', required:false, note:'連携体制がある場合'},
+    ],
+    fields:[
+      {id:'taisho',t:'radio',label:'届出対象',
+        opts:['在宅患者医療用麻薬持続注射療法加算（250点）','在宅中心静脈栄養法加算（150点）','両方'],
+        hint:'該当する届出内容を選択してください。'},
+      {id:'yakuzaishi',t:'text',label:'担当薬剤師の氏名・麻薬取扱者免許番号',
+        hint:'麻薬持続注射療法加算の場合、担当薬剤師の麻薬取扱者免許番号（都道府県知事免許）が必要です。',
+        showIf:{field:'taisho',matchesAny:['在宅患者医療用麻薬持続注射療法加算（250点）','両方']}},
+      {id:'renk_iryo',t:'text',label:'連携医療機関・訪問看護ステーション名',
+        hint:'在宅患者への対応で連携している医療機関・訪問看護ステーションの名称を記載してください。'},
+      {id:'taisei',t:'textarea',label:'管理・指導体制の概要',
+        hint:'在宅患者への薬剤管理指導の実施体制（緊急時の対応・医療チームとの連携・服薬確認方法等）を記載してください。'},
+    ]
+  },
+  {
+    id:'f90', yosiki:'様式90・様式4', name:'かかりつけ薬剤師指導料・包括管理料',
+    pts:'算定ごとに異なる', cat:'かかりつけ',
+    desc:'届出するかかりつけ薬剤師1名ずつについて要件を記載します。複数届出する場合は繰り返してください。',
+    attachments:[
+      {label:'様式90（かかりつけ薬剤師指導料）記入済み', required:true},
+      {label:'様式4（薬剤師の名簿）記入済み ※薬剤師1名ごとに1枚', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'各薬剤師の薬剤師免許証の写し', required:true},
+      {label:'各薬剤師の保険薬剤師登録証の写し', required:true},
+      {label:'研修認定薬剤師証・専門薬剤師証等の写し（研修認定を取得している薬剤師分）', required:true},
+      {label:'勤務時間・在籍期間を証明する書類（タイムカード・雇用契約書等）', required:false, note:'必要に応じて確認される場合があります'},
+    ],
+    fields:[
+      {id:'yakuzaishi_name',t:'text',label:'かかりつけ薬剤師の氏名（全員）',
+        hint:'届出するかかりつけ薬剤師の氏名を「、」区切りで全員記載してください。薬剤師1名ごとに様式4が必要です。'},
+      {id:'menkyobango',t:'text',label:'薬剤師免許番号（各薬剤師）',
+        hint:'届出するかかりつけ薬剤師全員の薬剤師免許番号を記載してください。'},
+      {id:'hokenmenkyobango',t:'text',label:'保険薬剤師登録番号（各薬剤師）',
+        hint:'届出するかかりつけ薬剤師全員の保険薬剤師登録番号を記載してください。'},
+      {id:'kinmu_years',t:'number',label:'保険薬局勤務経験年数（最短の薬剤師の年数）',unit:'年',
+        hint:'保険薬局（保険医療機関薬剤部含む）における薬剤師としての勤務経験が3年以上必要です。'},
+      {id:'toukyoku_hours',t:'number',label:'当該薬局での週当たり勤務時間',unit:'時間',
+        hint:'届出するかかりつけ薬剤師が当該保険薬局に週32時間以上勤務していることが要件です。'},
+      {id:'zaiseki_months',t:'number',label:'当該薬局の継続在籍期間（最短の薬剤師の月数）',unit:'ヶ月',
+        hint:'当該保険薬局に継続して1年以上（12か月以上）在籍していることが要件です。'},
+      {id:'kenshu',t:'text',label:'研修認定等の取得状況（各薬剤師）',
+        hint:'日本薬剤師研修センター研修認定薬剤師、専門薬剤師、認定薬剤師等の取得状況を記載してください。（例：研修認定薬剤師 第○号）'},
+    ]
+  },
+  {
+    id:'f92', yosiki:'様式92', name:'特定薬剤管理指導加算2',
+    pts:'100点（悪性腫瘍患者）', cat:'服薬管理',
+    desc:'抗悪性腫瘍剤等を使用する患者に対する薬学的管理指導の体制要件の届出です。',
+    attachments:[
+      {label:'様式92（特定薬剤管理指導加算2）記入済み', required:true},
+      {label:'別添2（共通表紙）記入済み', required:true},
+      {label:'担当薬剤師のがん専門薬剤師証・がん指導薬剤師証・緩和薬療認定薬剤師証等の写し', required:true},
+      {label:'連携医療機関との連携体制を示す書類（連携協定書・覚書等）', required:false, note:'連携体制がある場合'},
+    ],
+    fields:[
+      {id:'yakuzaishi',t:'text',label:'担当薬剤師の氏名・がん専門関連資格',
+        hint:'抗悪性腫瘍剤等の薬学的管理指導を行う薬剤師の氏名と、がん専門薬剤師・がん指導薬剤師・緩和薬療認定薬剤師等の関連資格を記載してください。'},
+      {id:'renk_hospital',t:'text',label:'連携している専門医療機関名',
+        hint:'がん専門医療機関やがん診療連携拠点病院等、連携している医療機関の名称を記載してください。'},
+      {id:'taio_ganshu',t:'textarea',label:'対応可能ながん種・化学療法レジメンの概要',
+        hint:'当薬局で主に対応しているがん種（乳がん・大腸がん等）と主要な化学療法レジメン（EC療法・FOLFOX療法等）の概要を記載してください。'},
+      {id:'renk_tasei',t:'textarea',label:'多職種との連携体制',
+        hint:'がん専門看護師・緩和ケア認定看護師・医師・栄養士等との連携体制について記載してください。'},
+    ]
+  },
+];
+
+// ============================================================
+// State & Persistence
+// ============================================================
+const SAVE_KEY = 'yakkyoku_v2_data';
+let state = { selected:[], facData:{}, clChecked:{}, step:0, outXL:true, outPDF:false };
+let basicFields = ['b_name','b_code','b_addr','b_tel','b_fax','b_owner','b_mgr','b_mgr_lic','b_mgr_ins','b_date','b_mgr_years','b_ph_full','b_ph_part','b_ph_total','b_h_mon_s','b_h_mon_e','b_h_mon_n','b_h_tue_s','b_h_tue_e','b_h_tue_n','b_h_wed_s','b_h_wed_e','b_h_wed_n','b_h_thu_s','b_h_thu_e','b_h_thu_n','b_h_fri_s','b_h_fri_e','b_h_fri_n','b_h_sat_s','b_h_sat_e','b_h_sat_n','b_h_sun_s','b_h_sun_e','b_h_sun_n','b_h_hol_s','b_h_hol_e','b_h_hol_n','b_holiday','b_rx_total','b_rx_main','b_rx_main_n','b_rx_conc','b_rx_total_chiki','b_rx_chiki_period','b_generic','b_generic_q'];
+
+function $(id){ return document.getElementById(id); }
+function gv(id){ const e=$(id); return e?e.value:''; }
+function sv(id,v){ const e=$(id); if(e) e.value=(v||''); }
+
+function markUnsaved(){
+  $('saveDot').className='save-dot unsaved';
+  $('saveStatus').textContent='未保存の変更があります';
+  calcConc();
+  refreshChikiTable();
+}
+
+function calcConc(){
+  const total = parseFloat($('b_rx_total')&&$('b_rx_total').value)||0;
+  const main  = parseFloat($('b_rx_main_n')&&$('b_rx_main_n').value)||0;
+  const el    = $('b_rx_conc');
+  const disp  = $('b_rx_conc_disp');
+  if(total>0 && main>=0){
+    const rate = Math.round(main/total*1000)/10;
+    if(el){ el.value=rate; }
+    if(disp){ disp.textContent=rate.toFixed(1)+' %'; }
+  } else {
+    if(el){ el.value=''; }
+    if(disp){ disp.textContent='— %'; }
+  }
+}
+
+function saveAll(){
+  const b={};
+  basicFields.forEach(id=>{ b[id]=gv(id); });
+  localStorage.setItem(SAVE_KEY, JSON.stringify({selected:state.selected, basic:b, facData:state.facData, clChecked:state.clChecked, step:state.step, ts:new Date().toISOString()}));
+  $('saveDot').className='save-dot';
+  $('saveStatus').textContent='保存済み（'+new Date().toLocaleTimeString('ja-JP')+'）';
+}
+
+function loadAll(){
+  try{
+    const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+    if(!d) return;
+    if(d.selected) state.selected=d.selected;
+    if(d.facData) state.facData=d.facData;
+    if(d.clChecked) state.clChecked=d.clChecked;
+    if(d.basic) Object.entries(d.basic).forEach(([k,v])=>sv(k,v));
+    if(d.ts){ $('saveStatus').textContent='前回保存を読み込みました（'+new Date(d.ts).toLocaleString('ja-JP')+'）'; $('saveDot').className='save-dot'; }
+  }catch(e){}
+}
+
+function clearAll(){
+  if(!confirm('すべてのデータをリセットしますか？この操作は取り消せません。')) return;
+  localStorage.removeItem(SAVE_KEY);
+  // stateを完全に初期化
+  state.selected=[];
+  state.facData={};
+  state.clChecked={};
+  state.step=0;
+  state.outXL=true;
+  state.outPDF=false;
+  // 全基本情報フィールドをクリア
+  basicFields.forEach(id=>{ const e=$(id); if(e) e.value=''; });
+  // 集中率表示リセット
+  const concEl=$('b_rx_conc'), concDisp=$('b_rx_conc_disp');
+  if(concEl) concEl.value='';
+  if(concDisp) concDisp.textContent='— %';
+  // UI再構築
+  initFacGrid();
+  updateSelPreview();
+  const ft=$('facTabs'); if(ft) ft.innerHTML='';
+  const ff=$('facForms'); if(ff) ff.innerHTML='';
+  const sa=$('summaryArea'); if(sa) sa.innerHTML='';
+  const ca=$('checklistArea'); if(ca) ca.innerHTML='';
+  const clp=$('clProgFill'); if(clp) clp.style.width='0%';
+  const clt=$('clProgText'); if(clt) clt.textContent='0 / 0 件 確認済み';
+  const outXL=$('outXL'); if(outXL) outXL.classList.add('sel');
+  const outPDF=$('outPDF'); if(outPDF) outPDF.classList.remove('sel');
+  $('saveDot').className='save-dot';
+  $('saveStatus').textContent='データなし';
+  gotoStep(0);
+}
+
+// ============================================================
+// Step nav
+// ============================================================
+function gotoStep(n){
+  [0,1,2,3].forEach(i=>{
+    $('page'+i).style.display='none';
+    const s=$('sn'+i);
+    s.classList.remove('active','done');
+    if(i<n) s.classList.add('done'); else if(i===n) s.classList.add('active');
+  });
+  $('page'+n).style.display='block';
+  state.step=n;
+  $('progFill').style.width=(25*(n+1))+'%';
+  if(n===2) renderFacForms();
+  if(n===3) renderSummary();
+  window.scrollTo(0,0);
+}
+
+// ============================================================
+// Step 1: Facility grid
+// ============================================================
+function initFacGrid(){
+  $('facGrid').innerHTML=FAC.map(f=>{
+    const chk=state.selected.includes(f.id);
+    let badge='';
+    if(f.badge==='new') badge='<span class="badge badge-new">★新設</span>';
+    else if(f.badge==='change') badge='<span class="badge badge-change">★改定</span>';
+    else if(f.badge==='report') badge='<span class="badge badge-report">報告書</span>';
+    return `<label class="fac-card${chk?' checked':''}" id="fc_${f.id}">
+      <input type="checkbox" ${chk?'checked':''} onchange="toggleFac('${f.id}',this)">
+      <div>
+        <div class="fc-name">${f.name}${badge}</div>
+        <div class="fc-meta">${f.yosiki} ／ ${f.pts}</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function toggleFac(id,el){
+  $('fc_'+id).classList.toggle('checked',el.checked);
+  if(el.checked){ if(!state.selected.includes(id)) state.selected.push(id); }
+  else state.selected=state.selected.filter(x=>x!==id);
+  updateSelPreview(); markUnsaved();
+}
+
+function updateSelPreview(){
+  const p=$('selPreview'), t=$('selTags');
+  if(!state.selected.length){p.style.display='none';return;}
+  p.style.display='block';
+  t.innerHTML=state.selected.map(id=>{
+    const f=FAC.find(x=>x.id===id);
+    return `<span class="tag">${f?f.name:id}</span>`;
+  }).join('');
+}
+
+// ============================================================
+// Step 3: Facility forms
+// ============================================================
+function isFieldVisible(fid, field){
+  if(!field.showIf) return true;
+  const parentVal = (state.facData[fid]||{})[field.showIf.field]||'';
+  return field.showIf.matchesAny.some(v=>parentVal.includes(v));
+}
+
+function updateFieldVisibility(fid){
+  const f=FAC.find(x=>x.id===fid);
+  if(!f) return;
+  f.fields.forEach(field=>{
+    if(!field.showIf) return;
+    const el=document.getElementById(fid+'_fg_'+field.id);
+    if(el) el.classList.toggle('field-hidden', !isFieldVisible(fid,field));
+  });
+}
+
+function renderFacForms(){
+  const tb=$('facTabs'), fc=$('facForms');
+  if(!state.selected.length){
+    fc.innerHTML='<div class="card"><p style="color:#888;font-size:13px">STEP1で施設基準を選択してください。</p></div>';
+    tb.innerHTML=''; return;
+  }
+  tb.innerHTML=state.selected.map((id,i)=>{
+    const f=FAC.find(x=>x.id===id);
+    return `<button class="tab-btn${i===0?' active':''}" id="tabt_${id}" onclick="showTab('${id}')">${f?f.yosiki:id}</button>`;
+  }).join('');
+
+  // カードを個別に生成・追加（innerHTML一括代入だと特殊IDが誤動作するため）
+  fc.innerHTML = '';
+  state.selected.forEach((id,i)=>{
+    const f=FAC.find(x=>x.id===id);
+    if(!f) return;
+
+    // 地域支援体制加算は専用カスタムカードを生成
+    if(id==='f87_3'){
+      const card=buildChikiCard(i===0);
+      fc.appendChild(card);
+      return;
+    }
+
+    const card=document.createElement('div');
+    card.className='card';
+    card.id='tabp_'+id;
+    card.style.display=(i===0?'block':'none');
+    card.innerHTML=`<div class="card-title">${f.yosiki} ／ ${f.name}</div>
+      <div class="card-sub">${f.desc||''}</div>`;
+
+    f.fields.forEach(field=>{
+      const val=(state.facData[id]||{})[field.id]||'';
+      const visible=isFieldVisible(id,field);
+      const fg=document.createElement('div');
+      fg.className='field-group'+(visible?'':' field-hidden');
+      fg.id=id+'_fg_'+field.id;
+
+      if(field.t==='text'){
+        fg.innerHTML=`<div class="field-label">${field.label}</div>
+          <div class="hint">${field.hint}</div>
+          <input type="text" id="${id}_${field.id}" value="${esc(val)}" oninput="saveFac('${id}','${field.id}',this.value)">`;
+      } else if(field.t==='number'){
+        fg.innerHTML=`<div class="field-label">${field.label}${field.unit?' （'+field.unit+'）':''}</div>
+          <div class="hint">${field.hint}</div>
+          <input type="number" id="${id}_${field.id}" value="${esc(val)}" min="0" oninput="saveFac('${id}','${field.id}',this.value)" style="max-width:200px">`;
+      } else if(field.t==='textarea'){
+        fg.innerHTML=`<div class="field-label">${field.label}</div>
+          <div class="hint">${field.hint}</div>
+          <textarea id="${id}_${field.id}" oninput="saveFac('${id}','${field.id}',this.value)">${esc(val)}</textarea>`;
+      } else if(field.t==='radio'){
+        const opts=field.opts.map(o=>{
+          const s=val===o;
+          return `<div class="radio-opt${s?' sel':''}" onclick="selRadio('${id}','${field.id}','${esca(o)}',this,'${id}_rg_${field.id}')"><input type="radio" name="${id}_${field.id}" ${s?'checked':''}> ${o}</div>`;
+        }).join('');
+        fg.innerHTML=`<div class="field-label">${field.label}</div>
+          <div class="hint">${field.hint}</div>
+          <div class="radio-group" id="${id}_rg_${field.id}">${opts}</div>`;
+      }
+      card.appendChild(fg);
+    });
+    fc.appendChild(card);
+  });
+  // 全タブのshowIf表示制御を適用
+  requestAnimationFrame(()=>{
+    state.selected.forEach(fid=>{
+      if(fid!=='f87_3') updateFieldVisibility(fid);
+    });
+  });
+}
+
+// ============================================================
+// 地域支援体制加算 専用カード（Excelロジック移植）
+// ============================================================
+
+// 必要件数計算: Excelのロジックをそのまま移植
+// ceil_custom: 小数第2位を四捨五入して小数第1位が1以上なら切り上げ
+function calcRequired(ratio, rxCount){
+  const base = Math.max(10000, rxCount);
+  const raw = ratio / 10000 * base;
+  const rounded2 = Math.round(raw * 100) / 100;
+  const intPart = Math.floor(rounded2);
+  const dec = rounded2 - intPart;
+  if(dec === 0) return intPart;
+  const dec1 = Math.round(dec * 10) / 10;
+  return dec1 >= 0.1 ? Math.ceil(rounded2) : intPart;
+}
+
+// 地域支援の項目定義（Excelと完全対応）
+const CHIKI_ITEMS_K1 = [
+  {id:'ci1', label:'①時間外・夜間休日対応', ratio:40,  key:'jitsu_yakan'},
+  {id:'ci2', label:'②麻薬調剤',             ratio:1,   key:'jitsu_mayaku'},
+  {id:'ci3', label:'③重複・相互作用防止',   ratio:20,  key:'jitsu_juufuku'},
+  {id:'ci4', label:'④かかりつけ薬剤師',     ratio:20,  key:'jitsu_kakari',  must:true},
+  {id:'ci5', label:'⑤外来服薬支援料',       ratio:1,   key:'jitsu_gairaif'},
+  {id:'ci6', label:'⑥服用薬剤調整支援料',   ratio:1,   key:'jitsu_hukuyaku'},
+  {id:'ci7', label:'⑦個人在宅訪問',         ratio:24,  key:'jitsu_zaita'},
+  {id:'ci8', label:'⑧服薬情報等提供料',     ratio:30,  key:'jitsu_johoteik'},
+  {id:'ci9', label:'⑨小児特定加算',         ratio:1,   key:'jitsu_shoji'},
+  {id:'ci10',label:'⑩多職種連携会議',        ratio:1,   key:'jitsu_taishoku'},
+];
+const CHIKI_ITEMS_KX = [
+  {id:'ci1', label:'①時間外・夜間休日対応', ratio:400, key:'jitsu_yakan'},
+  {id:'ci2', label:'②麻薬調剤',             ratio:10,  key:'jitsu_mayaku'},
+  {id:'ci3', label:'③重複・相互作用防止',   ratio:40,  key:'jitsu_juufuku'},
+  {id:'ci4', label:'④かかりつけ薬剤師',     ratio:40,  key:'jitsu_kakari',  must:true},
+  {id:'ci5', label:'⑤外来服薬支援料',       ratio:12,  key:'jitsu_gairaif'},
+  {id:'ci6', label:'⑥服用薬剤調整支援料',   ratio:1,   key:'jitsu_hukuyaku'},
+  {id:'ci7', label:'⑦個人在宅訪問',         ratio:24,  key:'jitsu_zaita',   must:true},
+  {id:'ci8', label:'⑧服薬情報等提供料',     ratio:60,  key:'jitsu_johoteik'},
+  {id:'ci9', label:'⑨小児特定加算',         ratio:1,   key:'jitsu_shoji'},
+  {id:'ci10',label:'⑩多職種連携会議',        ratio:5,   key:'jitsu_taishoku'},
+];
+
+function getChikiItems(isK1){ return isK1 ? CHIKI_ITEMS_K1 : CHIKI_ITEMS_KX; }
+
+function calcChikiKubun(rxCount, isK1, vals){
+  const items = getChikiItems(isK1);
+  const achieved = items.filter(it=>{
+    const req = calcRequired(it.ratio, rxCount);
+    const actual = parseFloat(vals[it.key])||0;
+    return actual >= req;
+  });
+  const achievedIds = new Set(achieved.map(x=>x.id));
+  const count = achieved.length;
+
+  if(isK1){
+    // 加算2: 8項目以上達成
+    if(count >= 8) return '地域支援体制加算２（40点）';
+    // 加算1: ④含む3項目以上
+    if(achievedIds.has('ci4') && count >= 3) return '地域支援体制加算１（32点）';
+    return '';
+  } else {
+    // 加算4: 8項目以上達成
+    if(count >= 8) return '地域支援体制加算４（40点）';
+    // 加算3: ④⑦含む3項目以上
+    if(achievedIds.has('ci4') && achievedIds.has('ci7') && count >= 3) return '地域支援体制加算３（10点）';
+    return '';
+  }
+}
+
+function buildChikiCard(isFirst){
+  const fid = 'f87_3';
+  const d = state.facData[fid]||{};
+  const rxCount = parseInt(gv('b_rx_total_chiki'))||parseInt(gv('b_rx_total'))||0;
+  const isK1 = (d.chiki_base_kubun||'') === '調剤基本料１算定薬局';
+  const items = getChikiItems(isK1);
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.id = 'tabp_f87_3';
+  card.style.display = isFirst ? 'block' : 'none';
+
+  // 体制要件セクション
+  const taisei_fields = [
+    {id:'h24', label:'1. 24時間調剤・在宅対応体制',
+     opts:['自局のみで24時間対応','連携薬局との取り決めにより24時間対応'],
+     hint:'常時調剤に応じることができる体制が要件。'},
+    {id:'renk_name', label:'連携薬局名・所在地（連携対応の場合）', t:'text',
+     hint:'連携により24時間対応を確保している薬局の名称と所在地を記載してください。',
+     showIf:{field:'h24',matchesAny:['連携薬局との取り決めにより24時間対応']}},
+    {id:'mednaviregistered', label:'2. PMDAメディナビへの登録',
+     opts:['登録済み（登録確認メールを保管）','未登録'],
+     hint:'登録確認メールの写しを添付。'},
+    {id:'yakureki', label:'3. 薬剤服用歴の記録',
+     opts:['全患者に記録あり（様式見本を添付）'],
+     hint:'全患者の薬剤服用歴を記録していることが要件。'},
+    {id:'kenshu', label:'4. 職員研修の実施',
+     opts:['研修計画あり・実施実績あり','研修計画あり・未実施（実施予定）'],
+     hint:'研修計画書と実施実績を添付。'},
+    {id:'mukunyusetsu', label:'5. 在宅医療への取組',
+     opts:['在宅患者への調剤・服薬指導を実施中','実施体制を構築予定'],
+     hint:'在宅患者訪問薬剤管理指導等を実施できる体制が要件。'},
+    {id:'iryozairyo', label:'6. 医療材料・衛生材料の供給体制',
+     opts:['供給体制あり','供給体制構築予定'],
+     hint:'在宅医療に必要な医療材料・衛生材料を供給できる体制が要件。'},
+    {id:'kinen', label:'7. 施設内禁煙',
+     opts:['施設内禁煙（健康増進法第29条対応）'],
+     hint:'薬局内の禁煙対応が体制要件の一つ。'},
+    {id:'meeting', label:'地域の多職種連携会議への参加実績', t:'textarea',
+     hint:'地域ケア会議等への参加実績（会議名・参加日）を記載してください。'},
+  ];
+
+  let html = `
+  <div class="card-title">様式87の3・87の3の2 ／ 地域支援体制加算</div>
+  <div class="card-sub">令和6年改定で届出直しが必要。体制要件（様式87の3）＋実績要件（様式87の3の2）の両方が必要。</div>
+
+  <div class="sec-label">調剤基本料区分（実績要件の計算に影響）</div>
+  <div class="radio-group" id="f87_3_rg_chiki_base_kubun">
+    ${['調剤基本料１算定薬局','調剤基本料２・３等（基本料１以外）の算定薬局'].map(o=>{
+      const s=(d.chiki_base_kubun||'')=== o;
+      return `<div class="radio-opt${s?' sel':''}" onclick="selRadio('f87_3','chiki_base_kubun','${o.replace(/'/g,"&#39;")}',this,'f87_3_rg_chiki_base_kubun');rebuildChikiCard()">${o}</div>`;
+    }).join('')}
+  </div>
+
+  <div class="sec-label" style="margin-top:18px">体制要件（共通）</div>`;
+
+  taisei_fields.forEach(fld=>{
+    const val = d[fld.id]||'';
+    let showCls = '';
+    if(fld.showIf){
+      const pv = d[fld.showIf.field]||'';
+      if(!fld.showIf.matchesAny.some(v=>pv.includes(v))) showCls = ' field-hidden';
+    }
+    html += `<div class="field-group${showCls}" id="f87_3_fg_${fld.id}">
+      <div class="field-label">${fld.label}</div>
+      <div class="hint">${fld.hint}</div>`;
+    if(fld.t==='text'){
+      html += `<input type="text" id="f87_3_${fld.id}" value="${esc(val)}" oninput="saveFac('f87_3','${fld.id}',this.value)">`;
+    } else if(fld.t==='textarea'){
+      html += `<textarea id="f87_3_${fld.id}" oninput="saveFac('f87_3','${fld.id}',this.value)">${esc(val)}</textarea>`;
+    } else {
+      const grpId = `f87_3_rg_${fld.id}`;
+      html += `<div class="radio-group" id="${grpId}">${fld.opts.map(o=>{
+        const s=val===o;
+        return `<div class="radio-opt${s?' sel':''}" onclick="selRadio('f87_3','${fld.id}','${o.replace(/'/g,"&#39;")}',this,'${grpId}');updateChikiShowIf()">${o}</div>`;
+      }).join('')}</div>`;
+    }
+    html += '</div>';
+  });
+
+  // 実績要件テーブル
+  html += buildChikiJitsuHTML(rxCount, isK1, d, items);
+
+  card.innerHTML = html;
+  return card;
+}
+
+function buildChikiJitsuHTML(rxCount, isK1, d, items){
+  const kubun = calcChikiKubun(rxCount, isK1, d);
+  const rxCount_chiki = parseInt(gv('b_rx_total_chiki'))||0;
+  const chikiPeriod = gv('b_rx_chiki_period')||'（STEP2で期間を入力）';
+  const rxDisplay = rxCount > 0 ? rxCount.toLocaleString() : '（STEP2「調剤実績②」に入力してください）';
+
+  let rows = '';
+  let achievedCount = 0;
+  items.forEach(it=>{
+    const req = rxCount > 0 ? calcRequired(it.ratio, rxCount) : '—';
+    const actual = d[it.key]!=null ? parseFloat(d[it.key])||0 : null;
+    const achieved = rxCount > 0 && actual !== null && actual >= req;
+    if(achieved) achievedCount++;
+    const reqStr = rxCount > 0 ? req.toLocaleString() : '—';
+    const actualStr = actual !== null ? actual.toLocaleString() : '';
+    const statusIcon = actual === null ? '' : (achieved ? '✓' : '✗');
+    const rowBg = actual !== null ? (achieved ? 'background:#eaf3de' : 'background:#fff3f3') : '';
+    const mustBadge = it.must ? '<span style="font-size:9px;background:#fff0f0;color:#c0392b;border:1px solid #f5c6c6;border-radius:8px;padding:1px 5px;margin-left:4px">必須</span>' : '';
+    rows += `<tr style="border-bottom:1px solid #e8eef6;${rowBg}">
+      <td style="padding:6px 10px;font-size:12.5px">${it.label}${mustBadge}</td>
+      <td style="padding:6px 10px;text-align:center;font-size:12.5px;color:#1a3f6f;font-weight:600">${reqStr}</td>
+      <td style="padding:4px 6px;text-align:center">
+        <input type="number" min="0" value="${actualStr}" placeholder="0"
+          style="width:80px;padding:5px 7px;border:1.5px solid #cdd5e0;border-radius:5px;font-size:12.5px;text-align:right"
+          oninput="saveChikiJitsu('${it.key}',this.value)" id="chiki_inp_${it.key}">
+      </td>
+      <td style="padding:6px 10px;text-align:center;font-size:15px;color:${achieved?'#2e7d32':'#c0392b'};font-weight:700">${statusIcon}</td>
+    </tr>`;
+  });
+
+  const kubunColor = kubun ? '#2e7d32' : '#999';
+  const kubunBg = kubun ? '#eaf3de' : '#f0f4fa';
+
+  return `
+  <div class="sec-label" style="margin-top:18px">実績要件（様式87の3の2）
+    <span style="font-size:10px;color:#666;font-weight:400">集計期間: ${chikiPeriod} ／ 総受付枚数: ${rxDisplay} 枚 ／ ${isK1?'基本料１':'基本料１以外'}の計算式を適用</span>
+  </div>
+  <div class="hint warn">⚠️ <strong>実績の集計期間：算定を開始する月の前月から遡って1年間</strong>（例：6月算定開始の場合、前年5月1日〜当年4月30日）<br>STEP2「調剤実績②」に地域支援用の処方箋総受付回数を入力すると、各項目の必要件数が自動計算されます。</div>
+  <div style="background:#fff;border:1px solid #d0d9e8;border-radius:8px;overflow:hidden;margin-bottom:12px">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#1a3f6f;color:#fff">
+          <th style="padding:8px 10px;text-align:left;font-size:12px;width:45%">実績項目</th>
+          <th style="padding:8px 10px;text-align:center;font-size:12px;width:20%">必要件数</th>
+          <th style="padding:8px 10px;text-align:center;font-size:12px;width:20%">実績入力（件）</th>
+          <th style="padding:8px 10px;text-align:center;font-size:12px;width:15%">達成</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:8px;border:2px solid ${kubunColor};background:${kubunBg};margin-bottom:12px">
+    <div style="font-size:13px;font-weight:600;color:#444">自動判定結果：</div>
+    <div style="font-size:15px;font-weight:700;color:${kubunColor}" id="chiki_kubun_result">
+      ${kubun || '（処方箋枚数・実績を入力してください）'}
+    </div>
+    <div style="font-size:11px;color:#666;margin-left:auto">達成 ${achievedCount}/10 項目</div>
+  </div>`;
+}
+
+function saveChikiJitsu(key, val){
+  if(!state.facData['f87_3']) state.facData['f87_3']={};
+  state.facData['f87_3'][key] = val==='' ? null : parseFloat(val)||0;
+  markUnsaved();
+  refreshChikiTable();
+}
+
+function rebuildChikiCard(){
+  // 基本料区分切り替え時にカード全体を再生成
+  const isFirst = document.getElementById('tabp_f87_3')&&document.getElementById('tabp_f87_3').style.display==='block';
+  const oldCard = document.getElementById('tabp_f87_3');
+  if(!oldCard) return;
+  const newCard = buildChikiCard(isFirst);
+  oldCard.parentNode.replaceChild(newCard, oldCard);
+}
+
+function refreshChikiTable(){
+  const card = document.getElementById('tabp_f87_3');
+  if(!card) return;
+  const d = state.facData['f87_3']||{};
+  const rxCount = parseInt(gv('b_rx_total_chiki'))||parseInt(gv('b_rx_total'))||0;
+  const isK1 = (d.chiki_base_kubun||'')==='調剤基本料１算定薬局';
+  const items = getChikiItems(isK1);
+  const kubun = calcChikiKubun(rxCount, isK1, d);
+  const kubunColor = kubun ? '#2e7d32' : '#999';
+  const kubunBg = kubun ? '#eaf3de' : '#f0f4fa';
+  let achievedCount = 0;
+
+  items.forEach(it=>{
+    const req = rxCount > 0 ? calcRequired(it.ratio, rxCount) : null;
+    const actual = d[it.key]!=null ? parseFloat(d[it.key]) : null;
+    const achieved = req !== null && actual !== null && actual >= req;
+    if(achieved) achievedCount++;
+    const row = document.getElementById('chiki_inp_'+it.key);
+    if(row){
+      const tr = row.closest('tr');
+      if(tr){
+        tr.style.background = actual === null ? '' : (achieved ? '#eaf3de' : '#fff3f3');
+        const statusCell = tr.cells[3];
+        if(statusCell){
+          statusCell.textContent = actual === null ? '' : (achieved ? '✓' : '✗');
+          statusCell.style.color = achieved ? '#2e7d32' : '#c0392b';
+        }
+        const reqCell = tr.cells[1];
+        if(reqCell) reqCell.textContent = req !== null ? req.toLocaleString() : '—';
+      }
+    }
+  });
+  const res = document.getElementById('chiki_kubun_result');
+  if(res){
+    res.textContent = kubun || '（処方箋枚数・実績を入力してください）';
+    res.style.color = kubunColor;
+    res.parentElement.style.borderColor = kubunColor;
+    res.parentElement.style.background = kubunBg;
+    const cntEl = res.parentElement.querySelector('div:last-child');
+    if(cntEl) cntEl.textContent = `達成 ${achievedCount}/10 項目`;
+  }
+}
+
+function updateChikiShowIf(){
+  const d = state.facData['f87_3']||{};
+  // h24 連携→連携薬局名を表示
+  const renkFg = document.getElementById('f87_3_fg_renk_name');
+  if(renkFg){
+    const show = (d.h24||'').includes('連携薬局');
+    renkFg.classList.toggle('field-hidden', !show);
+  }
+}
+
+function showTab(id){
+  state.selected.forEach(fid=>{
+    const p=$('tabp_'+fid), t=$('tabt_'+fid);
+    if(p) p.style.display='none';
+    if(t) t.classList.remove('active');
+  });
+  const sp=$('tabp_'+id), st=$('tabt_'+id);
+  if(sp) sp.style.display='block';
+  if(st) st.classList.add('active');
+  updateFieldVisibility(id);
+}
+
+function saveFac(fid,field,val){
+  if(!state.facData[fid]) state.facData[fid]={};
+  state.facData[fid][field]=val; markUnsaved();
+}
+function selRadio(fid,field,val,el,gid){
+  document.querySelectorAll('#'+gid+' .radio-opt').forEach(x=>x.classList.remove('sel'));
+  el.classList.add('sel'); saveFac(fid,field,val);
+  // 条件付き表示を更新
+  updateFieldVisibility(fid);
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esca(s){ return String(s||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+
+// ============================================================
+// Step 4: Summary
+// ============================================================
+function renderSummary(){
+  const rows=[
+    ['薬局名称',gv('b_name')],['保険薬局コード',gv('b_code')],
+    ['所在地',gv('b_addr')],['電話番号',gv('b_tel')],
+    ['開設者',gv('b_owner')],['管理薬剤師',gv('b_mgr')],
+    ['届出予定日',gv('b_date')],
+    ['常勤薬剤師数',gv('b_ph_full')+'名'],['非常勤薬剤師数',gv('b_ph_part')+'名'],
+    ['常勤換算',gv('b_ph_total')],
+    ['処方箋総受付回数（前年度）',gv('b_rx_total')+'回'],
+    ['後発医薬品調剤割合',gv('b_generic')+'%'],
+  ];
+  const bHtml=rows.map(([k,v])=>`<div class="sum-row"><span class="sum-key">${k}</span><span class="sum-val">${v||'—'}</span></div>`).join('');
+  const tags=state.selected.map(id=>{const f=FAC.find(x=>x.id===id);return `<span class="tag">${f?f.name:id}</span>`;}).join('');
+  $('summaryArea').innerHTML=`
+    <div class="sec-label">薬局基本情報</div>${bHtml}
+    <div class="sec-label" style="margin-top:14px">届出施設基準（${state.selected.length}件）</div>
+    <div class="tag-list" style="margin-bottom:0">${tags||'<span style="color:#aaa">未選択</span>'}</div>`;
+  renderChecklist();
+}
+
+// ============================================================
+// Checklist
+// ============================================================
+function renderChecklist(){
+  const area=$('checklistArea');
+  if(!area) return;
+  if(!state.selected.length){
+    area.innerHTML='<p style="color:#aaa;font-size:13px">施設基準が選択されていません。</p>';
+    updateClProgress(); return;
+  }
+  if(!state.clChecked) state.clChecked={};
+
+  // 共通書類（全加算共通）
+  const commonItems=[
+    {label:'別添2（特掲診療料施設基準届出書・共通表紙）　記入済み', required:true, note:'様式名・受理番号欄・施設基準名を正確に記入'},
+    {label:'辞退届（既存届出を変更・辞退する場合のみ）', required:false, note:'区分変更が生じる場合のみ添付'},
+  ];
+
+  let html='<div class="cl-section">';
+  html+='<div class="cl-section-title">全施設基準 共通書類<span class="cl-section-yosiki">すべての届出に必要</span></div>';
+  commonItems.forEach((item,idx)=>{
+    const ckId='cl_common_'+idx;
+    const ck=state.clChecked[ckId]||false;
+    html+=`<label class="cl-item${ck?' checked':''}" onclick="toggleCl('${ckId}',this)">
+      <input type="checkbox" ${ck?'checked':''}>
+      <div class="cl-item-body">
+        <div class="cl-item-label">${item.label}</div>
+        ${item.note?`<div class="cl-item-note">${item.note}</div>`:''}
+      </div>
+      <span class="cl-req-badge ${item.required?'cl-req':'cl-opt'}">${item.required?'必須':'条件付'}</span>
+    </label>`;
+  });
+  html+='</div>';
+
+  state.selected.forEach(id=>{
+    const f=FAC.find(x=>x.id===id);
+    if(!f||!f.attachments) return;
+    html+='<div class="cl-section">';
+    html+=`<div class="cl-section-title">${f.name}<span class="cl-section-yosiki">${f.yosiki}</span></div>`;
+    f.attachments.forEach((item,idx)=>{
+      const ckId=`cl_${id}_${idx}`;
+      const ck=state.clChecked[ckId]||false;
+      html+=`<label class="cl-item${ck?' checked':''}" onclick="toggleCl('${ckId}',this)">
+        <input type="checkbox" ${ck?'checked':''}>
+        <div class="cl-item-body">
+          <div class="cl-item-label">${item.label}</div>
+          ${item.note?`<div class="cl-item-note">${item.note}</div>`:''}
+        </div>
+        <span class="cl-req-badge ${item.required?'cl-req':'cl-opt'}">${item.required?'必須':'条件付'}</span>
+      </label>`;
+    });
+    html+='</div>';
+  });
+  area.innerHTML=html;
+  updateClProgress();
+}
+
+function toggleCl(ckId, labelEl){
+  event.preventDefault();
+  if(!state.clChecked) state.clChecked={};
+  const cb=labelEl.querySelector('input[type=checkbox]');
+  const newVal=!state.clChecked[ckId];
+  cb.checked=newVal;
+  state.clChecked[ckId]=newVal;
+  labelEl.classList.toggle('checked',newVal);
+  updateClProgress();
+  markUnsaved();
+}
+
+function updateClProgress(){
+  const items=document.querySelectorAll('#checklistArea .cl-item');
+  const total=items.length;
+  const checked=document.querySelectorAll('#checklistArea .cl-item.checked').length;
+  const pct=total>0?Math.round(checked/total*100):0;
+  const fill=$('clProgFill'), txt=$('clProgText');
+  if(fill) fill.style.width=pct+'%';
+  if(txt) txt.textContent=`${checked} / ${total} 件 確認済み（${pct}%）`;
+}
+
+// ============================================================
+// Output
+// ============================================================
+// API エンドポイント（Renderのデプロイ先URLに自動設定）
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : '';  // 同一サーバーから配信する場合は相対パス
+
+function exportStateJSON(){
+  // JSONダウンロード（バックアップ用）
+  const basic = {};
+  basicFields.forEach(id=>{ basic[id]=gv(id)||''; });
+  const exportData = {
+    selected: state.selected,
+    basic: basic,
+    facData: state.facData,
+    clChecked: state.clChecked,
+    exportedAt: new Date().toISOString(),
+  };
+  const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const nm   = gv('b_name')||'薬局';
+  const dt   = (gv('b_date')||'').replace(/-/g,'');
+  a.href = url;
+  a.download = `app_state_${nm}_${dt}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function generateWordFiles(){
+  if(!state.selected.length){
+    alert('STEP1で施設基準を選択してください。');
+    return;
+  }
+  if(!gv('b_name')||!gv('b_date')){
+    alert('STEP2で薬局名と届出日を入力してください。');
+    return;
+  }
+
+  // ボタンをローディング状態に
+  const btn = document.getElementById('generateWordBtn');
+  const origText = btn.innerHTML;
+  btn.innerHTML = '⏳ 生成中... しばらくお待ちください';
+  btn.disabled = true;
+
+  try {
+    // 入力データを構築
+    const basic = {};
+    basicFields.forEach(id=>{ basic[id]=gv(id)||''; });
+    const postData = {
+      selected: state.selected,
+      basic: basic,
+      facData: state.facData,
+    };
+
+    const resp = await fetch(API_BASE + '/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(postData),
+    });
+
+    if(!resp.ok){
+      const err = await resp.json().catch(()=>({error:'不明なエラー'}));
+      throw new Error(err.error || `サーバーエラー (${resp.status})`);
+    }
+
+    // ZIPファイルをダウンロード
+    const blob = await resp.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const nm   = gv('b_name')||'薬局';
+    const dt   = (gv('b_date')||'').replace(/-/g,'');
+    a.href     = url;
+    a.download = `施設基準届出書類_${nm}_${dt}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    // 成功メッセージ
+    btn.innerHTML = '✅ ダウンロード完了！';
+    setTimeout(()=>{ btn.innerHTML = origText; btn.disabled = false; }, 3000);
+
+  } catch(e) {
+    alert('エラーが発生しました：\n' + e.message + '\n\nしばらく時間をおいて再試行してください。');
+    btn.innerHTML = origText;
+    btn.disabled = false;
+  }
+}
+
+function downloadFillScript(){
+  alert('このページのURLをシェアしてください。Wordファイルはサーバー上で生成されます。');
+}
+
+function toggleOut(t){
+  if(t==='xl'){state.outXL=!state.outXL;$('outXL').classList.toggle('sel',state.outXL);}
+  else{state.outPDF=!state.outPDF;$('outPDF').classList.toggle('sel',state.outPDF);}
+}
+
+function doExport(){
+  if(!state.outXL&&!state.outPDF){alert('出力形式を選択してください。');return;}
+  if(state.outXL) exportXL();
+  if(state.outPDF) exportPDF();
+}
+
+function exportXL(){
+  if(typeof XLSX==='undefined'){alert('XLSXライブラリが読み込めません。');return;}
+  const wb=XLSX.utils.book_new();
+  const nm=gv('b_name')||'薬局';
+  const dt=gv('b_date')||new Date().toLocaleDateString('ja-JP');
+
+  // 表紙シート
+  const cov=[
+    ['調剤報酬 施設基準 届出書類一式（作業用）'],[''],
+    ['※本ファイルは作業補助用です。提出には公式様式を使用してください。'],
+    ['公式様式URL：https://kouseikyoku.mhlw.go.jp/kantoshinetsu/shinsei/shido_kansa/shitei_kijun/tokukei_shinryo_r06.html'],[''],
+    ['作成日',new Date().toLocaleDateString('ja-JP')],['届出予定日',dt],[''],
+    ['【薬局基本情報】'],
+    ['薬局名称',gv('b_name')],['保険薬局コード',gv('b_code')],
+    ['所在地',gv('b_addr')],['電話番号',gv('b_tel')],['FAX',gv('b_fax')],
+    ['開設者',gv('b_owner')],['管理薬剤師',gv('b_mgr')],
+    ['管理薬剤師免許番号',gv('b_mgr_lic')],['保険薬剤師登録番号',gv('b_mgr_ins')],[''],
+    ['【薬剤師情報】'],
+    ['常勤薬剤師数',gv('b_ph_full')+'名'],['非常勤薬剤師数',gv('b_ph_part')+'名'],['常勤換算合計',gv('b_ph_total')],[''],
+    ['【開局情報】'],
+    ['【開局時間】'],
+    ['曜日','開始','終了','備考'],
+    ['月曜日',gv('b_h_mon_s'),gv('b_h_mon_e'),gv('b_h_mon_n')],
+    ['火曜日',gv('b_h_tue_s'),gv('b_h_tue_e'),gv('b_h_tue_n')],
+    ['水曜日',gv('b_h_wed_s'),gv('b_h_wed_e'),gv('b_h_wed_n')],
+    ['木曜日',gv('b_h_thu_s'),gv('b_h_thu_e'),gv('b_h_thu_n')],
+    ['金曜日',gv('b_h_fri_s'),gv('b_h_fri_e'),gv('b_h_fri_n')],
+    ['土曜日',gv('b_h_sat_s'),gv('b_h_sat_e'),gv('b_h_sat_n')],
+    ['日曜日',gv('b_h_sun_s'),gv('b_h_sun_e'),gv('b_h_sun_n')],
+    ['祝日',gv('b_h_hol_s'),gv('b_h_hol_e'),gv('b_h_hol_n')],
+    ['年末年始等',gv('b_holiday'),'',''],[''],
+    ['【前年度調剤実績】'],
+    ['【調剤実績①：集中率・調剤基本料区分用（6/1〜5/31）】'],
+    ['処方箋総受付回数（集中率用）',gv('b_rx_total')+'回'],
+    ['集中率',gv('b_rx_conc')+'%'],
+    ['主たる保険医療機関',gv('b_rx_main')],[''],
+    ['【調剤実績②：地域支援体制加算実績要件用】'],
+    ['実績集計期間',gv('b_rx_chiki_period')],
+    ['処方箋総受付回数（地域支援用）',gv('b_rx_total_chiki')+'回'],[''],
+    ['後発医薬品調剤割合（直近3か月）',gv('b_generic')+'%'],[''],
+    ['【届出施設基準一覧】'],['様式番号','施設基準名','分類','点数'],
+    ...state.selected.map(id=>{const f=FAC.find(x=>x.id===id); return [f?f.yosiki:'',f?f.name:'',f?f.cat:'',f?f.pts:''];})
+  ];
+  const wsc=XLSX.utils.aoa_to_sheet(cov);
+  wsc['!cols']=[{wch:30},{wch:55},{wch:15},{wch:15}];
+  XLSX.utils.book_append_sheet(wb,wsc,'表紙');
+
+  // 各施設基準シート
+  state.selected.forEach(id=>{
+    const f=FAC.find(x=>x.id===id); if(!f) return;
+    const rows=[
+      ['【作業用】'+f.yosiki+' '+f.name],
+      ['※公式様式への転記が必要です'],[''],
+      ['薬局名称',gv('b_name')],['保険薬局コード',gv('b_code')],
+      ['所在地',gv('b_addr')],['管理薬剤師',gv('b_mgr')],['届出年月日',dt],[''],
+      ['【記載事項】']
+    ];
+    f.fields.forEach(fld=>{
+      const val=(state.facData[id]||{})[fld.id]||'';
+      rows.push([fld.label,val]);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:36},{wch:70}];
+    let sn=(f.yosiki||'').replace(/[\[\]\/\\?*:]/g,'').slice(0,28);
+    XLSX.utils.book_append_sheet(wb,ws,sn);
+  });
+
+  // 添付書類チェックリストシート
+  const clRows=[['施設基準届出 添付書類チェックリスト'],[''],['様式・書類名','必須/条件付','確認状況','備考']];
+  const commonCl=[
+    ['別添2（特掲診療料施設基準届出書・共通表紙）','必須','','様式名・受理番号欄・施設基準名を正確に記入'],
+    ['辞退届（既存届出を変更・辞退する場合）','条件付','','区分変更が生じる場合のみ添付'],
+  ];
+  commonCl.forEach(r=>clRows.push(r));
+  state.selected.forEach(id=>{
+    const f=FAC.find(x=>x.id===id);
+    if(!f||!f.attachments) return;
+    clRows.push(['','','','']);
+    clRows.push([`【${f.name} / ${f.yosiki}】`,'','','']);
+    f.attachments.forEach(item=>{
+      const ck=(state.clChecked[`cl_${id}_${f.attachments.indexOf(item)}`])||false;
+      clRows.push([item.label, item.required?'必須':'条件付', ck?'✓ 確認済':'□ 未確認', item.note||'']);
+    });
+  });
+  const wsCl=XLSX.utils.aoa_to_sheet(clRows);
+  wsCl['!cols']=[{wch:55},{wch:10},{wch:12},{wch:35}];
+  XLSX.utils.book_append_sheet(wb,wsCl,'添付書類チェックリスト');
+
+  XLSX.writeFile(wb,`施設基準作業用_${nm}_${dt.replace(/[\/\-]/g,'')}.xlsx`);
+}
+
+function exportPDF(){
+  if(typeof window.jspdf==='undefined'){alert('jsPDFライブラリが読み込めません。');return;}
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const nm=gv('b_name')||'薬局';
+  const dt=gv('b_date')||new Date().toLocaleDateString('ja-JP');
+  let y=20;
+  const ML=15,MR=195,LH=5.8;
+  const chk=()=>{if(y>275){doc.addPage();y=20;}};
+  const tx=(s,x,cy,sz,bd)=>{
+    doc.setFontSize(sz||9.5);doc.setFont('helvetica',bd?'bold':'normal');
+    doc.text(String(s||''),x,cy);
+  };
+  const hl=(cy)=>{doc.setDrawColor(160);doc.setLineWidth(0.2);doc.line(ML,cy,MR,cy);};
+
+  // Cover page
+  tx('【作業用】調剤報酬 施設基準 届出書類一式',ML,y,12,true);y+=LH*1.8;
+  tx('※本PDFは作業補助用です。提出には関東信越厚生局の公式様式を使用してください。',ML,y,8);y+=LH*1.2;
+  tx('薬局名：'+gv('b_name')+'　　届出予定日：'+dt,ML,y,9);y+=LH;
+  hl(y);y+=LH;
+  tx('■ 薬局基本情報',ML,y,10,true);y+=LH;
+  [['薬局名称',gv('b_name')],['保険薬局コード',gv('b_code')],['所在地',gv('b_addr')],['電話番号',gv('b_tel')],
+   ['開設者',gv('b_owner')],['管理薬剤師',gv('b_mgr')],['管理薬剤師免許番号',gv('b_mgr_lic')],
+   ['届出予定日',dt],['常勤薬剤師数',gv('b_ph_full')+'名'],['非常勤薬剤師数',gv('b_ph_part')+'名'],
+   ['後発医薬品調剤割合',gv('b_generic')+'%'],['処方箋総受付回数',gv('b_rx_total')+'回']
+  ].forEach(([k,v])=>{chk();tx(k+':',ML+2,y,9,true);const ls=doc.splitTextToSize(String(v||'—'),120);ls.forEach((l,i)=>tx(l,ML+56,y+i*LH*0.85,9));y+=LH;});
+  y+=LH;
+  tx('■ 届出施設基準一覧（'+state.selected.length+'件）',ML,y,10,true);y+=LH;
+  state.selected.forEach(id=>{chk();const f=FAC.find(x=>x.id===id);if(!f)return;tx('  ・'+f.yosiki+' '+f.name,ML+2,y,9);y+=LH;});
+
+  // Each facility page
+  state.selected.forEach(id=>{
+    doc.addPage();y=20;
+    const f=FAC.find(x=>x.id===id);if(!f)return;
+    tx('【作業用】'+f.yosiki,ML,y,9);y+=LH*0.9;
+    tx(f.name+' 施設基準に係る届出書添付書類',ML,y,11,true);y+=LH*1.5;
+    hl(y);y+=LH;
+    tx('薬局名称：'+gv('b_name'),ML,y,9);y+=LH;
+    tx('保険薬局コード：'+gv('b_code')+'　　所在地：'+gv('b_addr'),ML,y,8);y+=LH;
+    tx('管理薬剤師：'+gv('b_mgr')+'　　届出年月日：'+dt,ML,y,8);y+=LH*1.3;
+    hl(y);y+=LH;
+    f.fields.forEach(fld=>{
+      chk();
+      const val=(state.facData[id]||{})[fld.id]||'（未入力）';
+      tx(fld.label+':',ML,y,8.5,true);y+=LH*0.85;
+      doc.splitTextToSize(String(val),MR-ML-8).forEach(l=>{chk();tx(l,ML+4,y,8.5);y+=LH*0.85;});
+      y+=1.5;hl(y);y+=LH*0.7;
+    });
+  });
+
+  doc.save(`施設基準作業用_${nm}_${dt.replace(/[\/\-]/g,'')}.pdf`);
+}
+
+// ============================================================
+// Init
+// ============================================================
+function init(){
+  loadAll();
+  initFacGrid();
+  updateSelPreview();
+  basicFields.forEach(id=>{const e=$(id);if(e)e.addEventListener('input',markUnsaved);});
+  calcConc();
+  gotoStep(state.step||0);
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
